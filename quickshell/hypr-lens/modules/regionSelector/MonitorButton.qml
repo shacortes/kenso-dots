@@ -14,7 +14,7 @@ ToolbarTabButton {
 
     // Signal emitted when user left-clicks to capture this monitor
     signal captureRequested(string monitorName)
-    // Signal emitted when user right-clicks to edit this monitor's capture with swappy
+    // Signal emitted when user right-clicks to edit this monitor's capture with satty
     signal editRequested(string monitorName)
 
     current: false

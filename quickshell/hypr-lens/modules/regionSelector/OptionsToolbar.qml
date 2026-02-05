@@ -67,7 +67,7 @@ Toolbar {
 
     // Monitor capture buttons - one-click full-screen capture for each monitor
     // Left-click: capture and copy to clipboard
-    // Right-click: capture and edit with swappy
+    // Right-click: capture and edit with satty
     Repeater {
         model: root.showMonitorButtons ? root.monitors : []
         delegate: MonitorButton {

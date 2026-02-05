@@ -1,0 +1,3 @@
+[general]
+output-filename = "~/Pictures/ScreenShots/satty-%Y%m%d-%H:%M:%S.png"
+early-exit = true

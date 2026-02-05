@@ -78,7 +78,7 @@ Singleton {
         ];
     }
 
-    // Edit with swappy (respects copyAlsoSaves setting)
+    // Edit with satty (respects copyAlsoSaves setting)
     function buildEditCommand(screenshotPath: string, rx: int, ry: int, rw: int, rh: int, saveDir: string, alsoSave: bool): list<string> {
         const cropBase = buildCropBase(screenshotPath, rx, ry, rw, rh);
         const cropToStdout = `${cropBase} -`;
@@ -87,7 +87,7 @@ Singleton {
         if (!alsoSave) {
             return [
                 "bash", "-c",
-                `${cropToStdout} | swappy -f -; \
+                `${cropToStdout} | satty -f -; \
                 ${buildNotify("Copied to clipboard", "")}; \
                 ${cleanup}`
             ];
@@ -97,7 +97,7 @@ Singleton {
         return [
             "bash", "-c",
             `${buildSaveSetup(expandedSaveDir)} && \
-            ${cropToStdout} | swappy -f -; \
+            ${cropToStdout} | satty -f -; \
             wl-paste > "$savePath" && \
             ${buildNotify("Copied & saved", "$savePath")}; \
             ${cleanup}`

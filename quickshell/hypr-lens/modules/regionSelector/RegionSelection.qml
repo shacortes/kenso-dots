@@ -65,7 +65,7 @@ PanelWindow {
         }
     }
 
-    // Handle monitor button right-click - capture full screen and edit with swappy
+    // Handle monitor button right-click - capture full screen and edit with satty
     function editFullMonitor(monitorName: string) {
         root.action = RegionSelection.SnipAction.Edit;
         captureFullMonitor(monitorName);
@@ -189,7 +189,7 @@ PanelWindow {
         [RegionSelection.SnipAction.Copy]: (rx, ry, rw, rh, absX, absY) =>
             SnipCommands.buildCopyCommand(root.screenshotPath, rx, ry, rw, rh, root.saveScreenshotDir, Config.options.screenSnip.copyAlsoSaves),
         [RegionSelection.SnipAction.Edit]: (rx, ry, rw, rh, absX, absY) =>
-            SnipCommands.buildEditCommand(root.screenshotPath, rx, ry, rw, rh, root.saveScreenshotDir, Config.options.screenSnip.copyAlsoSaves),
+            SnipCommands.buildEditCommand(root.screenshotPath, rx, ry, rw, rh, Config.options.screenSnip.copyAlsoSaves),
         [RegionSelection.SnipAction.Search]: (rx, ry, rw, rh, absX, absY) =>
             SnipCommands.buildSearchCommand(root.screenshotPath, rx, ry, rw, rh, "https://lens.google.com"),
         [RegionSelection.SnipAction.CharRecognition]: (rx, ry, rw, rh, absX, absY) =>
