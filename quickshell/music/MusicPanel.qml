@@ -69,8 +69,7 @@ PanelWindow {
         anchors.centerIn: parent
         width: 400
         height: 140
-		Layout.bottomMargin: 5
-        radius: 30
+        radius: 25
         color: col("surface", "#282b24")
         border.width: 0
         border.color: col("outline_variant","#44483e")
@@ -114,7 +113,7 @@ PanelWindow {
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 4
+                spacing: 3
 
                 Text {
                     text: trackTitle || "Nothing is playing"
