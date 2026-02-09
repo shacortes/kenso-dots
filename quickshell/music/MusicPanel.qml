@@ -2,7 +2,8 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
-
+import Qt5Compat.GraphicalEffects
+import Quickshell.Widgets
 PanelWindow {
     id: musicPanel
 
@@ -16,18 +17,14 @@ PanelWindow {
     property real length: 0
     property bool hasTrack: playerStatus === "Playing" || playerStatus === "Paused"
 
+    property bool shuffleEnabled: false
+    property string loopMode: "None"
+
     visible: true
     exclusionMode: ExclusionMode.Ignore
 
-    anchors {
-        top: true
-        left: true
-        right: true
-    }
-
-    margins {
-        top: visiblePanel ? 60 : -220
-    }
+    anchors { top: true; left: true; right: true }
+    margins { top: visiblePanel ? 60 : -220 }
 
     implicitWidth: 400
     implicitHeight: 140
@@ -70,25 +67,22 @@ PanelWindow {
         width: 400
         height: 140
         radius: 25
-        color: col("surface", "#282b24")
-        border.width: 0
-        border.color: col("outline_variant","#44483e")
+        color: col("surface","#282b24")
         clip: true
-        antialiasing: true
-        layer.enabled: true
-		layer.smooth: true
 
         RowLayout {
             anchors.fill: parent
             anchors.margins: 14
             spacing: 14
 
-            /* ---------- ALBUM ART ---------- */
-            Rectangle {
+            /* ---------- ALBUM ---------- */
+            ClippingRectangle {
                 width: 100
                 height: 100
                 radius: 18
                 clip: true
+
+				layer.enabled: true
                 color: col("surface_variant","#3b3f36")
 
                 Image {
@@ -96,8 +90,8 @@ PanelWindow {
                     source: artUrl
                     fillMode: Image.PreserveAspectCrop
                     smooth: true
-                    antialiasing: true
                     visible: artUrl !== ""
+                    antialiasing: true
                 }
 
                 Text {
@@ -115,21 +109,32 @@ PanelWindow {
                 Layout.fillHeight: true
                 spacing: 3
 
-                Text {
-                    text: trackTitle || "Nothing is playing"
-                    color: col("primary","#add18d")
-                    font.pixelSize: 16
-                    font.bold: true
+                /* ✅ FIXED TEXT CONTAINER */
+                ColumnLayout {
                     Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
+                    Layout.maximumWidth: 240
+                    spacing: 2
 
-                Text {
-                    text: trackArtist
-                    color: col("on_surface","#e2e3d9")
-                    opacity: 0.7
-                    font.pixelSize: 12
-                    visible: trackArtist !== ""
+                    Text {
+                        Layout.fillWidth: true
+                        text: trackTitle || "Nothing is playing"
+                        color: col("primary","#add18d")
+                        font.pixelSize: 16
+                        font.bold: true
+                        elide: Text.ElideRight
+                        wrapMode: Text.NoWrap
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: trackArtist
+                        color: col("on_surface","#e2e3d9")
+                        opacity: 0.7
+                        font.pixelSize: 12
+                        elide: Text.ElideRight
+                        wrapMode: Text.NoWrap
+                        visible: trackArtist !== ""
+                    }
                 }
 
                 Item { Layout.fillHeight: true }
@@ -146,6 +151,13 @@ PanelWindow {
                         height: parent.height
                         radius: 3
                         color: col("primary","#add18d")
+
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: 400
+                                easing.type: Easing.OutCubic
+                            }
+                        }
                     }
 
                     MouseArea {
@@ -166,25 +178,81 @@ PanelWindow {
                     spacing: 10
                     visible: hasTrack
 
-                    Text { text: formatTime(position); font.pixelSize: 10; color: col("on_surface_variant","#c4c8ba") }
+                    Text {
+                        text: formatTime(position)
+                        font.pixelSize: 10
+                        color: col("on_surface_variant","#c4c8ba")
+                    }
+
                     Item { Layout.fillWidth: true }
-                    Text { text: formatTime(length); font.pixelSize: 10; color: col("on_surface_variant","#c4c8ba") }
+
+                    Text {
+                        text: formatTime(length)
+                        font.pixelSize: 10
+                        color: col("on_surface_variant","#c4c8ba")
+                    }
                 }
 
                 /* ---------- CONTROLS ---------- */
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: 16
+                    spacing: 14
+
+                    MusicBtn {
+                        icon: "󰒟"
+                        color: shuffleEnabled
+                               ? musicPanel.col("primary_container")
+                               : "transparent"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: shuffleToggleProc.running = true
+                        }
+                    }
 
                     MusicBtn { icon: "󰒮"; cmd: "playerctl previous" }
-                    MusicBtn { icon: playerStatus === "Playing" ? "󰏤" : "󰐊"; cmd: "playerctl play-pause"; big: true }
+
+                    MusicBtn {
+                        icon: playerStatus === "Playing" ? "󰏤" : "󰐊"
+                        cmd: "playerctl play-pause"
+                        big: true
+                    }
+
                     MusicBtn { icon: "󰒭"; cmd: "playerctl next" }
+
+                    MusicBtn {
+                        icon:
+                            loopMode === "None" ? "󰑗" :
+                            loopMode === "Once" ? "󰑙" :
+                            "󰑖"
+
+                        color: loopMode !== "None"
+                               ? musicPanel.col("primary_container")
+                               : "transparent"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if(loopMode === "None") {
+                                    loopMode = "Once"
+                                    enableTrackLoop.running = true
+                                }
+                                else if(loopMode === "Once") {
+                                    loopMode = "Track"
+                                    enableTrackLoop.running = true
+                                }
+                                else {
+                                    loopMode = "None"
+                                    disableLoop.running = true
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    /* ---------- DATA ---------- */
     function formatTime(sec) {
         var m = Math.floor(sec/60)
         var s = Math.floor(sec%60)
@@ -193,42 +261,85 @@ PanelWindow {
 
     /* ---------- UPDATE ---------- */
     Timer {
-        interval: 500
+        interval: 250
         running: true
         repeat: true
-        onTriggered: musicStatusProc.running = true
+        onTriggered: {
+            musicStatusProc.running = true
+            shuffleProc.running = true
+        }
     }
 
-    /* ---------- PLAYERCTL ---------- */
-    Process { id: musicStatusProc; command: ["bash","-c","playerctl status 2>/dev/null || echo Stopped"]
-        stdout: SplitParser { onRead: data => { playerStatus = data.trim(); titleProc.running = true; artistProc.running = true; artProc.running = true; lenProc.running = true; posProc.running = true } }
+    Process { id: musicStatusProc; command:["bash","-c","playerctl status 2>/dev/null || echo Stopped"]
+        stdout: SplitParser {
+            onRead: data => {
+                playerStatus = data.trim()
+                titleProc.running = true
+                artistProc.running = true
+                artProc.running = true
+                lenProc.running = true
+                posProc.running = true
+            }
+        }
     }
 
-    Process { id: titleProc; command: ["bash","-c","playerctl metadata title 2>/dev/null"]; stdout: SplitParser { onRead: d => trackTitle = d.trim() } }
-    Process { id: artistProc; command: ["bash","-c","playerctl metadata artist 2>/dev/null"]; stdout: SplitParser { onRead: d => trackArtist = d.trim() } }
-    Process { id: artProc; command: ["bash","-c","playerctl metadata mpris:artUrl 2>/dev/null"]; stdout: SplitParser { onRead: d => artUrl = d.trim().replace("file://","") } }
-    Process { id: posProc; command: ["bash","-c","playerctl position 2>/dev/null || echo 0"]; stdout: SplitParser { onRead: d => position = parseFloat(d) } }
-    Process { id: lenProc; command: ["bash","-c","playerctl metadata mpris:length 2>/dev/null | awk '{print $1/1000000}'"]; stdout: SplitParser { onRead: d => length = parseFloat(d) } }
+    Process { id: shuffleProc; command:["bash","-c","playerctl shuffle 2>/dev/null || echo Off"]
+        stdout: SplitParser { onRead: d => shuffleEnabled = d.trim() === "On" }
+    }
+
+    Process { id: shuffleToggleProc; command:["bash","-c","playerctl shuffle Toggle"] }
+    Process { id: enableTrackLoop; command:["bash","-c","playerctl loop Track"] }
+    Process { id: disableLoop; command:["bash","-c","playerctl loop None"] }
+
+    Process { id: titleProc; command:["bash","-c","playerctl metadata title 2>/dev/null"]
+        stdout: SplitParser { onRead: d => trackTitle = d.trim() }
+    }
+
+    Process { id: artistProc; command:["bash","-c","playerctl metadata artist 2>/dev/null"]
+        stdout: SplitParser { onRead: d => trackArtist = d.trim() }
+    }
+
+    Process { id: artProc; command:["bash","-c","playerctl metadata mpris:artUrl 2>/dev/null"]
+        stdout: SplitParser { onRead: d => artUrl = d.trim().replace("file://","") }
+    }
+
+    Process { id: posProc; command:["bash","-c","playerctl position 2>/dev/null || echo 0"]
+        stdout: SplitParser { onRead: d => position = parseFloat(d) }
+    }
+
+    Process { id: lenProc; command:["bash","-c","playerctl metadata mpris:length 2>/dev/null | awk '{print $1/1000000}'"]
+        stdout: SplitParser { onRead: d => length = parseFloat(d) }
+    }
+
     Process { id: seekProc }
 
-    /* ---------- BUTTON COMPONENT ---------- */
     component MusicBtn: Rectangle {
         property string icon
-        property string cmd
+        property string cmd: ""
         property bool big: false
+
         width: big ? 44 : 34
         height: width
         radius: big ? 22 : 10
         color: big ? musicPanel.col("primary") : "transparent"
 
-        Text { anchors.centerIn: parent; text: icon; font.pixelSize: 18; color: big ? musicPanel.col("on_primary") : musicPanel.col("on_surface") }
+        Text {
+            anchors.centerIn: parent
+            text: icon
+            font.pixelSize: 18
+            color: big
+                   ? musicPanel.col("on_primary")
+                   : musicPanel.col("on_surface")
+        }
 
-        MouseArea { anchors.fill: parent; onClicked: proc.running = true }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: if(cmd !== "") proc.running = true
+        }
 
-        Process { id: proc; command: ["bash","-c", cmd] }
+        Process { id: proc; command:["bash","-c", cmd] }
     }
 
-    /* ---------- IPC ---------- */
     IpcHandler {
         target: "music"
         function toggle(): void { visiblePanel = !visiblePanel }

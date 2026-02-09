@@ -42,17 +42,9 @@
   "text-empty": "No Notifications",
   "script-fail-notify": true,
 
-  "scripts": {
-    "screenshot-action-script": {
-      "exec": "bash ~/.config/scripts/swaync-shot.sh open",
-      "app-name": "Screenshot",
-      "urgency": "Normal",
-      "run-on": "action"
-    }
-  },
+
 
   "widgets": [
-    "mpris",
     "title",
     "notifications",
     "buttons-grid"
