@@ -96,11 +96,12 @@
           "type": "button",
           "command": "hyprpicker -a"
         },
-        {
-          "label": "󰝟",
-          "type": "button",
-          "command": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
-        },
+		{
+		  "label": "",
+		  "type": "toggle",
+		  "command": "sh -c '$HOME/.config/hypr/scripts/caffeine_toggle.sh'",
+		  "update-command": "sh -c '[ -f /tmp/hypr_caffeine ] && echo true || echo false'"
+		},
         {
           "label": "",
           "type": "toggle",
