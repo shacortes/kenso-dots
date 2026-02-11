@@ -44,7 +44,7 @@
   },
 
   "network": {
-    "format-wifi": "󰤢",
+    "format-wifi": "󰤢  {essid}",
     "format-ethernet": "󰈀 ",
     "format-disconnected": "󰤠 ",
     "interval": 5,
