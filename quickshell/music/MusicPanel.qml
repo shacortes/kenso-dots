@@ -33,7 +33,7 @@ PanelWindow {
     /* ---------- MATUGEN ---------- */
     FileView {
         id: matugenFile
-        path: "/home/rick/.config/quickshell/matugen.json"
+        path: "~/.config/quickshell/matugen.json"
 
         onLoaded: {
             try {

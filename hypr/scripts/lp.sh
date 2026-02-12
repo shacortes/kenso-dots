@@ -10,7 +10,7 @@ for img in "$IMAGE_DIR"/*.{jpg,jpeg,png}; do
 
 
     # Run swwww on the image
-    /home/rick/.config/hypr/wppicker.sh "$img"
+    ~/.config/hypr/wppicker.sh "$img"
 
 done
 
